@@ -3,31 +3,30 @@ use env_logger::fmt::Color;
 use flowfield_nd::{FlowField, FluidSolver};
 use threegui::Vec3;
 
-use crate::{projection::{generate_axes, AxisProjection}, visualization::draw_n_grid};
+use crate::{projection::{generate_axes, AxisProjection}, visualization::{compute_n_grid, draw_n_grid}};
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 //#[derive(serde::Deserialize, serde::Serialize)]
 //#[serde(default)] // if we add new fields, give them default values when deserializing old state
 pub struct DemoApp {
-    //#[serde(skip)] // This how you opt-out of serialization of a field
-    axes: Vec<Vec3>,
-
-    dims: usize,
-
     sim: FluidSolver,
     proj: AxisProjection,
+
+    grid: Vec<(Vec3, Vec3)>,
 }
 
 impl Default for DemoApp {
     fn default() -> Self {
-        let dims = 3;
         let sim = FluidSolver::new(FlowField::new(3, 15));
         let proj = AxisProjection::new(sim.dims());
+
+        let example_array = &sim.get_flow().get_axes()[0];
+        let grid = compute_n_grid(&proj, example_array);
+
         Self {
+            grid,
             proj,
             sim,
-            dims,
-            axes: generate_axes(dims),
         }
     }
 }
@@ -85,18 +84,22 @@ impl eframe::App for DemoApp {
                     .with_desired_size(ui.available_size())
                     .show(ui, |thr| {
                         let paint = thr.painter();
+                        /*
                         threegui::utils::grid(
                             &paint,
                             10,
                             1.,
                             Stroke::new(1., Color32::from_gray(40)),
                         );
+                        */
+
+                        /*
                         for axis in &self.axes {
                             paint.circle_filled(*axis, 5., Color32::RED);
                         }
+                        */
 
-                        let example_array = &self.sim.get_flow().get_axes()[0];
-                        draw_n_grid(paint, &self.proj, example_array);
+                        draw_n_grid(&self.grid, paint, Stroke::new(1., Color32::from_gray(40)));
                     })
             });
         });
