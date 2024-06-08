@@ -9,7 +9,11 @@ pub fn project(pos: &[f32], axes: &[Vec3]) -> Vec3 {
 
 pub fn generate_axes(dims: usize) -> Vec<Vec3> {
     let mut rng = rand::thread_rng();
-    (0..dims).map(|_| gen_rand_vect(&mut rng, dims)).collect()
+    if dims <= 3 {
+        [Vec3::X, Vec3::Y, Vec3::Z][..dims].to_vec()
+    } else {
+        (0..dims).map(|_| gen_rand_vect(&mut rng, dims)).collect()
+    }
 }
 
 // https://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/

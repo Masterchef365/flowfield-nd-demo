@@ -8,12 +8,6 @@ use crate::projection::generate_axes;
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
 pub struct DemoApp {
-    // Example stuff:
-    label: String,
-
-    #[serde(skip)] // This how you opt-out of serialization of a field
-    value: f32,
-
     #[serde(skip)] // This how you opt-out of serialization of a field
     axes: Vec<Vec3>,
 
@@ -22,11 +16,8 @@ pub struct DemoApp {
 
 impl Default for DemoApp {
     fn default() -> Self {
-        let dims = 10_000;
+        let dims = 4;
         Self {
-            // Example stuff:
-            label: "Hello World!".to_owned(),
-            value: 2.7,
             dims,
             axes: generate_axes(dims),
         }
@@ -57,9 +48,6 @@ impl eframe::App for DemoApp {
 
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        // Put your widgets into a `SidePanel`, `TopBottomPanel`, `CentralPanel`, `Window` or `Area`.
-        // For inspiration and more examples, go to https://emilk.github.io/egui
-
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
 
