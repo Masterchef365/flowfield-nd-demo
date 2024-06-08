@@ -2,6 +2,8 @@ use egui::{Color32, Stroke};
 use env_logger::fmt::Color;
 use threegui::Vec3;
 
+use crate::projection::generate_axes;
+
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
@@ -11,14 +13,22 @@ pub struct DemoApp {
 
     #[serde(skip)] // This how you opt-out of serialization of a field
     value: f32,
+
+    #[serde(skip)] // This how you opt-out of serialization of a field
+    axes: Vec<Vec3>,
+
+    dims: usize,
 }
 
 impl Default for DemoApp {
     fn default() -> Self {
+        let dims = 10_000;
         Self {
             // Example stuff:
             label: "Hello World!".to_owned(),
             value: 2.7,
+            dims,
+            axes: generate_axes(dims),
         }
     }
 }
@@ -73,8 +83,9 @@ impl eframe::App for DemoApp {
             threegui::threegui(ui, |thr| {
                 let paint = thr.painter();
                 threegui::utils::grid(&paint, 10, 1., Stroke::new(1., Color32::from_gray(40)));
-                paint.circle_filled(Vec3::new(0., 0., 0.), 10., Color32::RED);
-                paint.circle_filled(Vec3::new(1., 1., 1.), 10., Color32::LIGHT_BLUE);
+                for axis in &self.axes {
+                    paint.circle_filled(*axis, 5., Color32::RED);
+                }
             })
         });
     }
