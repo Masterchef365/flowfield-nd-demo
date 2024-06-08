@@ -1,4 +1,4 @@
-use egui::{Color32, Stroke};
+use egui::{Color32, Stroke, Vec2};
 use env_logger::fmt::Color;
 use threegui::Vec3;
 
@@ -80,13 +80,22 @@ impl eframe::App for DemoApp {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            threegui::threegui(ui, |thr| {
-                let paint = thr.painter();
-                threegui::utils::grid(&paint, 10, 1., Stroke::new(1., Color32::from_gray(40)));
-                for axis in &self.axes {
-                    paint.circle_filled(*axis, 5., Color32::RED);
-                }
-            })
+            egui::Frame::canvas(ui.style()).show(ui, |ui| {
+                threegui::ThreeWidget::new("widge")
+                    .with_desired_size(ui.available_size())
+                    .show(ui, |thr| {
+                        let paint = thr.painter();
+                        threegui::utils::grid(
+                            &paint,
+                            10,
+                            1.,
+                            Stroke::new(1., Color32::from_gray(40)),
+                        );
+                        for axis in &self.axes {
+                            paint.circle_filled(*axis, 5., Color32::RED);
+                        }
+                    })
+            });
         });
     }
 }
