@@ -17,7 +17,7 @@ pub struct DemoApp {
 
 impl Default for DemoApp {
     fn default() -> Self {
-        let sim = FluidSolver::new(FlowField::new(3, 15));
+        let sim = FluidSolver::new(FlowField::new(4, 5));
         let proj = AxisProjection::new(sim.dims());
 
         let example_array = &sim.get_flow().get_axes()[0];

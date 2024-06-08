@@ -17,6 +17,7 @@ pub fn compute_n_grid(
             if arr.get(&*pos).is_some() {
                 let a = proj.project(&pos.iter().map(|p| *p as f32).collect::<Vec<f32>>());
                 let b = proj.project(&tl.iter().map(|p| *p as f32).collect::<Vec<f32>>());
+
                 out.push((a, b));
             }
         }

@@ -14,6 +14,8 @@ pub fn generate_axes(dims: usize) -> Vec<Vec3> {
 
 // https://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/
 pub fn gen_rand_vect(rng: &mut impl Rng, n: usize) -> Vec3 {
+    let n = n * 20;
+
     let golden_ratio = (1.0 + 5_f32.sqrt()) / 2.;
     let i = rng.gen_range(0..=n) as f32;
     let theta = 2. * PI * i / golden_ratio;
