@@ -1,23 +1,31 @@
 use egui::{Color32, Stroke, Vec2};
 use env_logger::fmt::Color;
+use flowfield_nd::{FlowField, FluidSolver};
 use threegui::Vec3;
 
-use crate::projection::generate_axes;
+use crate::{projection::{generate_axes, AxisProjection}, visualization::draw_n_grid};
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
-#[derive(serde::Deserialize, serde::Serialize)]
-#[serde(default)] // if we add new fields, give them default values when deserializing old state
+//#[derive(serde::Deserialize, serde::Serialize)]
+//#[serde(default)] // if we add new fields, give them default values when deserializing old state
 pub struct DemoApp {
-    #[serde(skip)] // This how you opt-out of serialization of a field
+    //#[serde(skip)] // This how you opt-out of serialization of a field
     axes: Vec<Vec3>,
 
     dims: usize,
+
+    sim: FluidSolver,
+    proj: AxisProjection,
 }
 
 impl Default for DemoApp {
     fn default() -> Self {
-        let dims = 4;
+        let dims = 3;
+        let sim = FluidSolver::new(FlowField::new(3, 15));
+        let proj = AxisProjection::new(sim.dims());
         Self {
+            proj,
+            sim,
             dims,
             axes: generate_axes(dims),
         }
@@ -32,19 +40,23 @@ impl DemoApp {
 
         // Load previous app state (if any).
         // Note that you must enable the `persistence` feature for this to work.
+        /*
         if let Some(storage) = cc.storage {
             return eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default();
         }
+        */
 
         Default::default()
     }
 }
 
 impl eframe::App for DemoApp {
+    /*
     /// Called by the frame work to save state before shutdown.
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
         eframe::set_value(storage, eframe::APP_KEY, self);
     }
+    */
 
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
@@ -82,6 +94,9 @@ impl eframe::App for DemoApp {
                         for axis in &self.axes {
                             paint.circle_filled(*axis, 5., Color32::RED);
                         }
+
+                        let example_array = &self.sim.get_flow().get_axes()[0];
+                        draw_n_grid(paint, &self.proj, example_array);
                     })
             });
         });

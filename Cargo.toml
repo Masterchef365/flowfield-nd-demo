@@ -22,6 +22,8 @@ log = "0.4"
 threegui = { git = "https://github.com/Masterchef365/threegui.git", rev = "ceda1ad" } 
 rand = "0.8"
 getrandom = { version = "0.2", features = ["js"] }
+flowfield-nd = { path = "../flowfield-nd" }
+ndarray = "0.15.6"
 
 # You only need serde if you want app persistence:
 serde = { version = "1", features = ["derive"] }

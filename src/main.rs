@@ -3,6 +3,7 @@
 
 mod projection;
 mod app;
+mod visualization;
 
 // When compiling natively:
 #[cfg(not(target_arch = "wasm32"))]
