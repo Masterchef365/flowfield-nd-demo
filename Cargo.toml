@@ -1,10 +1,10 @@
 [package]
-name = "eframe_template"
+name = "flowfield_nd_demo"
 version = "0.1.0"
-authors = ["Emil Ernerfeldt <emil.ernerfeldt@gmail.com>"]
+authors = ["Duncan Freeman <duncan.freeman1@gmail.com>"]
 edition = "2021"
 include = ["LICENSE-APACHE", "LICENSE-MIT", "**/*.rs", "Cargo.toml"]
-rust-version = "1.76"
+#rust-version = "1.76"
 
 [package.metadata.docs.rs]
 all-features = true
@@ -19,6 +19,7 @@ eframe = { version = "0.27.0", default-features = false, features = [
     "persistence",   # Enable restoring app state when restarting the app.
 ] }
 log = "0.4"
+threegui = { git = "https://github.com/Masterchef365/threegui.git", rev = "ceda1ad" } 
 
 # You only need serde if you want app persistence:
 serde = { version = "1", features = ["derive"] }

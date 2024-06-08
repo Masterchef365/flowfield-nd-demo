@@ -868,18 +868,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "eframe_template"
-version = "0.1.0"
-dependencies = [
- "eframe",
- "egui",
- "env_logger",
- "log",
- "serde",
- "wasm-bindgen-futures",
-]
-
-[[package]]
 name = "egui"
 version = "0.27.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -934,6 +922,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e87799f56edee11422267e1764dd0bf3fe1734888e8d2d0924a67b85f4998fbe"
 dependencies = [
  "bytemuck",
+ "mint",
  "serde",
 ]
 
@@ -1098,6 +1087,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "flowfield_nd_demo"
+version = "0.1.0"
+dependencies = [
+ "eframe",
+ "egui",
+ "env_logger",
+ "log",
+ "serde",
+ "threegui",
+ "wasm-bindgen-futures",
+]
+
+[[package]]
 name = "foreign-types"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1251,6 +1253,16 @@ dependencies = [
  "khronos_api",
  "log",
  "xml-rs",
+]
+
+[[package]]
+name = "glam"
+version = "0.25.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "151665d9be52f9bb40fc7966565d39666f2d1e69233571b71b87791c7e0528b3"
+dependencies = [
+ "mint",
+ "serde",
 ]
 
 [[package]]
@@ -1608,6 +1620,12 @@ dependencies = [
  "adler",
  "simd-adler32",
 ]
+
+[[package]]
+name = "mint"
+version = "0.5.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e53debba6bda7a793e5f99b8dacf19e626084f525f7829104ba9898f367d85ff"
 
 [[package]]
 name = "ndk"
@@ -2355,6 +2373,17 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.48",
+]
+
+[[package]]
+name = "threegui"
+version = "0.1.0"
+source = "git+https://github.com/Masterchef365/threegui.git?rev=ceda1ad#ceda1ad67e31f7dfd75eab39ae0ef791c6bac114"
+dependencies = [
+ "egui",
+ "glam",
+ "mint",
+ "serde",
 ]
 
 [[package]]
