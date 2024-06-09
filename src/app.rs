@@ -1,9 +1,9 @@
 use egui::{Color32, Stroke, Vec2};
 use env_logger::fmt::Color;
-use flowfield_nd::{FlowField, FluidSolver};
+use flowfield_nd::{FlowField, FluidSolver, PointCloud};
 use threegui::Vec3;
 
-use crate::{projection::{generate_axes, AxisProjection}, visualization::{compute_n_grid, draw_n_grid}};
+use crate::{projection::{generate_axes, AxisProjection}, visualization::{compute_n_grid, draw_n_grid, draw_pcld, random_pcld_uniform}};
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 //#[derive(serde::Deserialize, serde::Serialize)]
@@ -12,18 +12,23 @@ pub struct DemoApp {
     sim: FluidSolver,
     proj: AxisProjection,
 
+    pcld: PointCloud,
+
     grid: Vec<(Vec3, Vec3)>,
 }
 
 impl Default for DemoApp {
     fn default() -> Self {
-        let sim = FluidSolver::new(FlowField::new(4, 5));
+        let sim = FluidSolver::new(FlowField::new(3, 5));
         let proj = AxisProjection::new(sim.dims());
 
         let example_array = &sim.get_flow().get_axes()[0];
         let grid = compute_n_grid(&proj, example_array);
 
+        let pcld = random_pcld_uniform(1000, sim.get_flow().get_axes()[0].shape());
+
         Self {
+            pcld,
             grid,
             proj,
             sim,
@@ -100,6 +105,8 @@ impl eframe::App for DemoApp {
                         */
 
                         draw_n_grid(&self.grid, paint, Stroke::new(1., Color32::from_gray(40)));
+
+                        draw_pcld(&self.pcld, &self.proj, paint, 1., Color32::WHITE);
                     })
             });
         });

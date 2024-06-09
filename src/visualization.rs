@@ -1,6 +1,8 @@
 use crate::projection::Projection;
-use egui::Stroke;
-use ndarray::{Array, Dimension, IxDyn};
+use egui::{Color32, Stroke};
+use flowfield_nd::{FlowField, PointCloud};
+use ndarray::{Array, Array2, Dimension, IxDyn};
+use rand::Rng;
 use threegui::{Painter3D, Vec3};
 
 pub fn compute_n_grid(
@@ -34,4 +36,28 @@ pub fn draw_n_grid(
     for &(a, b) in buf {
         paint.line(a, b, stroke);
     }
+}
+
+pub fn draw_pcld(
+    pcld: &PointCloud,
+    proj: &dyn Projection,
+    paint: &Painter3D,
+    radius: f32,
+    color: Color32,
+) {
+    for pos in pcld.0.outer_iter() {
+        let pos3 = proj.project(pos.as_slice().unwrap());
+        paint.circle_filled(pos3, radius, color);
+    }
+}
+
+pub fn random_pcld_uniform(n: usize, volume: &[usize]) -> PointCloud {
+    let mut rng = rand::thread_rng();
+
+    // Don't start out of bounds ...
+    let margin = 0.5;
+
+    PointCloud(Array2::from_shape_fn((n, volume.len()), |(_, col)| {
+        rng.gen_range(margin..=volume[col] as f32 - 1.0 - margin)
+    }))
 }
