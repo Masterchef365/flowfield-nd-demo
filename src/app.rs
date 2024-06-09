@@ -1,4 +1,4 @@
-use egui::{Color32, Stroke, Vec2};
+use egui::{Color32, DragValue, Stroke, Vec2};
 use env_logger::fmt::Color;
 use flowfield_nd::{FlowField, FluidSolver, PointCloud};
 use threegui::Vec3;
@@ -19,7 +19,13 @@ pub struct DemoApp {
 
 impl Default for DemoApp {
     fn default() -> Self {
-        let sim = FluidSolver::new(FlowField::new(3, 5));
+        Self::from_dims(3)
+    }
+}
+
+impl DemoApp {
+    pub fn from_dims(dims: usize) -> Self {
+        let sim = FluidSolver::new(FlowField::new(dims, 5));
         let proj = AxisProjection::new(sim.dims());
 
         let example_array = &sim.get_flow().get_axes()[0];
@@ -34,9 +40,7 @@ impl Default for DemoApp {
             sim,
         }
     }
-}
 
-impl DemoApp {
     /// Called once before the first frame.
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         // This is also where you can customize the look and feel of egui using
@@ -45,10 +49,10 @@ impl DemoApp {
         // Load previous app state (if any).
         // Note that you must enable the `persistence` feature for this to work.
         /*
-        if let Some(storage) = cc.storage {
-            return eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default();
-        }
-        */
+           if let Some(storage) = cc.storage {
+           return eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default();
+           }
+           */
 
         Default::default()
     }
@@ -58,7 +62,7 @@ impl eframe::App for DemoApp {
     /*
     /// Called by the frame work to save state before shutdown.
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
-        eframe::set_value(storage, eframe::APP_KEY, self);
+    eframe::set_value(storage, eframe::APP_KEY, self);
     }
     */
 
@@ -80,6 +84,12 @@ impl eframe::App for DemoApp {
                 }
 
                 egui::widgets::global_dark_light_mode_buttons(ui);
+
+                let mut dims = self.sim.dims();
+                let resp = ui.add(DragValue::new(&mut dims).prefix("dims: "));
+                if resp.changed() {
+                    *self = Self::from_dims(dims);
+                }
             });
         });
 
@@ -90,19 +100,19 @@ impl eframe::App for DemoApp {
                     .show(ui, |thr| {
                         let paint = thr.painter();
                         /*
-                        threegui::utils::grid(
-                            &paint,
-                            10,
-                            1.,
-                            Stroke::new(1., Color32::from_gray(40)),
-                        );
-                        */
+                           threegui::utils::grid(
+                           &paint,
+                           10,
+                           1.,
+                           Stroke::new(1., Color32::from_gray(40)),
+                           );
+                           */
 
                         /*
-                        for axis in &self.axes {
-                            paint.circle_filled(*axis, 5., Color32::RED);
-                        }
-                        */
+                           for axis in &self.axes {
+                           paint.circle_filled(*axis, 5., Color32::RED);
+                           }
+                           */
 
                         draw_n_grid(&self.grid, paint, Stroke::new(1., Color32::from_gray(40)));
 
