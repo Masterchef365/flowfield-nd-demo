@@ -8,7 +8,7 @@ pub fn generate_axes(dims: usize) -> Vec<Vec3> {
     if dims <= 3 {
         [Vec3::X, Vec3::Y, Vec3::Z][..dims].to_vec()
     } else {
-        (0..dims).map(|_| gen_rand_vect(&mut rng, dims) * dims as f32).collect()
+        (0..dims).map(|_| gen_rand_vect(&mut rng, dims)).collect()
     }
 }
 

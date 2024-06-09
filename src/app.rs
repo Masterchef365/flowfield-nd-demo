@@ -87,10 +87,11 @@ impl eframe::App for DemoApp {
 
                 let mut dims = self.sim.dims();
                 let mut width = self.sim.width();
-                let resp_dims = ui.add(DragValue::new(&mut dims).prefix("dims: "));
-                let resp_width = ui.add(DragValue::new(&mut width).prefix("width: "));
+                let resp_dims = ui.add(DragValue::new(&mut dims).prefix("dims: ").clamp_range(1..=24));
+                let resp_width = ui.add(DragValue::new(&mut width).prefix("width: ").clamp_range(2..=100));
+                let regen = ui.button("Refresh").clicked();
 
-                if resp_dims.changed() || resp_width.changed() {
+                if resp_dims.changed() || resp_width.changed() || regen {
                     *self = Self::from_dims(dims, width);
                 }
             });
