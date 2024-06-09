@@ -19,13 +19,13 @@ pub struct DemoApp {
 
 impl Default for DemoApp {
     fn default() -> Self {
-        Self::from_dims(3)
+        Self::from_dims(3, 5)
     }
 }
 
 impl DemoApp {
-    pub fn from_dims(dims: usize) -> Self {
-        let sim = FluidSolver::new(FlowField::new(dims, 5));
+    pub fn from_dims(dims: usize, size: usize) -> Self {
+        let sim = FluidSolver::new(FlowField::new(dims, size));
         let proj = AxisProjection::new(sim.dims());
 
         let example_array = &sim.get_flow().get_axes()[0];
@@ -86,9 +86,12 @@ impl eframe::App for DemoApp {
                 egui::widgets::global_dark_light_mode_buttons(ui);
 
                 let mut dims = self.sim.dims();
-                let resp = ui.add(DragValue::new(&mut dims).prefix("dims: "));
-                if resp.changed() {
-                    *self = Self::from_dims(dims);
+                let mut width = self.sim.width();
+                let resp_dims = ui.add(DragValue::new(&mut dims).prefix("dims: "));
+                let resp_width = ui.add(DragValue::new(&mut width).prefix("width: "));
+
+                if resp_dims.changed() || resp_width.changed() {
+                    *self = Self::from_dims(dims, width);
                 }
             });
         });
