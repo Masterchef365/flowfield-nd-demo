@@ -1,6 +1,6 @@
 use crate::projection::Projection;
 use egui::{Color32, Stroke};
-use flowfield_nd::{FlowField, PointCloud};
+use flowfield_nd::{combos, fill_shape, FlowField, PointCloud};
 use ndarray::{Array, Array2, Dimension, IxDyn};
 use rand::Rng;
 use threegui::{Painter3D, Vec3};
@@ -11,18 +11,23 @@ pub fn compute_n_grid(
 ) -> Vec<(Vec3, Vec3)> {
     let mut out = vec![];
 
-    for (idx, _) in arr.indexed_iter() {
-        let tl = idx.as_array_view().to_vec();
+    let shape: Vec<usize> = arr.shape().iter().map(|w| w + 1).collect();
+
+    for tl in fill_shape(&shape) {
         let b = proj.project(&tl.iter().map(|p| *p as f32).collect::<Vec<f32>>());
 
         for dim in 0..arr.ndim() {
             let mut pos = tl.clone();
             pos[dim] += 1;
+
+            if pos[dim] < shape[dim] {
             //if arr.get(&*pos).is_some() {
+
                 let a = proj.project(&pos.iter().map(|p| *p as f32).collect::<Vec<f32>>());
 
                 out.push((a, b));
             //}
+            }
         }
     }
 
