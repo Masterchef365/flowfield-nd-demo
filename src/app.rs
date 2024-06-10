@@ -1,6 +1,7 @@
 use egui::{Color32, DragValue, Stroke, Vec2};
 use env_logger::fmt::Color;
-use flowfield_nd::{FlowField, FluidSolver, PointCloud};
+use flowfield_nd::{sweep_pointcloud, FlowField, FluidSolver, PointCloud, SolverConfig};
+use rand::Rng;
 use threegui::Vec3;
 
 use crate::{projection::{generate_axes, AxisProjection}, visualization::{compute_n_grid, draw_n_grid, draw_pcld, random_pcld_uniform}};
@@ -13,6 +14,7 @@ pub struct DemoApp {
     proj: AxisProjection,
 
     pcld: PointCloud,
+    cfg: SolverConfig,
 
     grid: Vec<(Vec3, Vec3)>,
 }
@@ -25,7 +27,16 @@ impl Default for DemoApp {
 
 impl DemoApp {
     pub fn from_dims(dims: usize, size: usize) -> Self {
-        let sim = FluidSolver::new(FlowField::new(dims, size));
+        let mut sim = FluidSolver::new(FlowField::new(dims, size));
+        let mut rng = rand::thread_rng();
+
+        let s = 1e-1;
+        for axis in sim.get_flow_mut().get_axes_mut() {
+            for elem in axis {
+                *elem = rng.gen_range(-s..=s);
+            }
+        }
+
         let proj = AxisProjection::new(sim.dims());
 
         let example_array = &sim.get_flow().get_axes()[0];
@@ -33,7 +44,10 @@ impl DemoApp {
 
         let pcld = random_pcld_uniform(1000, sim.get_flow().get_axes()[0].shape());
 
+        let cfg = Default::default();
+
         Self {
+            cfg,
             pcld,
             grid,
             proj,
@@ -68,6 +82,10 @@ impl eframe::App for DemoApp {
 
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        self.sim.step(&self.cfg);
+
+        sweep_pointcloud(&mut self.pcld, self.sim.get_flow(), self.cfg.dt);
+
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
 
