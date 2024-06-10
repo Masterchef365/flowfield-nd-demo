@@ -41,10 +41,9 @@ impl DemoApp {
 
         let proj = AxisProjection::new(sim.dims());
 
-        let example_array = &sim.get_flow().get_axes()[0];
-        let grid = compute_n_grid(&proj, example_array);
+        let grid = compute_n_grid(&proj, &sim.shape());
 
-        let pcld = random_pcld_uniform(1000, sim.get_flow().get_axes()[0].shape());
+        let pcld = random_pcld_uniform(1000, &sim.shape());
 
         let cfg = Default::default();
 

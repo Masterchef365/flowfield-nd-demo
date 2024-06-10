@@ -7,16 +7,16 @@ use threegui::{Painter3D, Vec3};
 
 pub fn compute_n_grid(
     proj: &dyn Projection,
-    arr: &Array<f32, IxDyn>,
+    shape: &[usize],
 ) -> Vec<(Vec3, Vec3)> {
     let mut out = vec![];
 
-    let shape: Vec<usize> = arr.shape().iter().map(|w| w + 0).collect();
+    let shape: Vec<usize> = shape.iter().map(|w| w + 0).collect();
 
     for tl in fill_shape(&shape) {
         let b = proj.project(&tl.iter().map(|p| *p as f32).collect::<Vec<f32>>());
 
-        for dim in 0..arr.ndim() {
+        for dim in 0..shape.len() {
             let mut pos = tl.clone();
             pos[dim] += 1;
 
