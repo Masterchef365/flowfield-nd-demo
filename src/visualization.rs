@@ -61,9 +61,9 @@ pub fn random_pcld_uniform(n: usize, volume: &[usize]) -> PointCloud {
     let mut rng = rand::thread_rng();
 
     // Don't start out of bounds ...
-    let margin = 0.5;
+    //let margin = 0.5;
 
     PointCloud(Array2::from_shape_fn((n, volume.len()), |(_, col)| {
-        rng.gen_range(margin..=volume[col] as f32 - margin)
+        rng.gen_range(0.0..volume[col] as f32 - 1.0)
     }))
 }
