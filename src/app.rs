@@ -17,6 +17,8 @@ pub struct DemoApp {
     cfg: SolverConfig,
 
     grid: Vec<(Vec3, Vec3)>,
+
+    draw_grid: bool,
 }
 
 impl Default for DemoApp {
@@ -47,6 +49,7 @@ impl DemoApp {
         let cfg = Default::default();
 
         Self {
+            draw_grid: true,
             cfg,
             pcld,
             grid,
@@ -109,6 +112,8 @@ impl eframe::App for DemoApp {
                 let resp_width = ui.add(DragValue::new(&mut width).prefix("width: ").clamp_range(2..=100));
                 let regen = ui.button("Refresh").clicked();
 
+                ui.checkbox(&mut self.draw_grid, "Draw grid");
+
                 if resp_dims.changed() || resp_width.changed() || regen {
                     *self = Self::from_dims(dims, width);
                 }
@@ -136,7 +141,9 @@ impl eframe::App for DemoApp {
                            }
                            */
 
-                        draw_n_grid(&self.grid, paint, Stroke::new(1., Color32::from_gray(40)));
+                        if self.draw_grid {
+                            draw_n_grid(&self.grid, paint, Stroke::new(1., Color32::from_gray(40)));
+                        }
 
                         draw_pcld(&self.pcld, &self.proj, paint, 1., Color32::WHITE);
                     })
