@@ -13,15 +13,16 @@ pub fn compute_n_grid(
 
     for (idx, _) in arr.indexed_iter() {
         let tl = idx.as_array_view().to_vec();
+        let b = proj.project(&tl.iter().map(|p| *p as f32).collect::<Vec<f32>>());
+
         for dim in 0..arr.ndim() {
             let mut pos = tl.clone();
             pos[dim] += 1;
-            if arr.get(&*pos).is_some() {
+            //if arr.get(&*pos).is_some() {
                 let a = proj.project(&pos.iter().map(|p| *p as f32).collect::<Vec<f32>>());
-                let b = proj.project(&tl.iter().map(|p| *p as f32).collect::<Vec<f32>>());
 
                 out.push((a, b));
-            }
+            //}
         }
     }
 
@@ -58,6 +59,6 @@ pub fn random_pcld_uniform(n: usize, volume: &[usize]) -> PointCloud {
     let margin = 0.5;
 
     PointCloud(Array2::from_shape_fn((n, volume.len()), |(_, col)| {
-        rng.gen_range(margin..=volume[col] as f32 - 1.0 - margin)
+        rng.gen_range(margin..=volume[col] as f32 - margin)
     }))
 }

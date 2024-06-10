@@ -85,6 +85,8 @@ impl eframe::App for DemoApp {
 
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        ctx.request_repaint();
+
         self.sim.step(&self.cfg);
 
         sweep_pointcloud(&mut self.pcld, self.sim.get_flow(), self.cfg.dt);
@@ -142,10 +144,10 @@ impl eframe::App for DemoApp {
                            */
 
                         if self.draw_grid {
-                            draw_n_grid(&self.grid, paint, Stroke::new(1., Color32::from_gray(40)));
+                            draw_n_grid(&self.grid, paint, Stroke::new(1., Color32::from_gray(90)));
                         }
 
-                        draw_pcld(&self.pcld, &self.proj, paint, 1., Color32::WHITE);
+                        draw_pcld(&self.pcld, &self.proj, paint, 1., Color32::from_gray(180));
                     })
             });
         });
