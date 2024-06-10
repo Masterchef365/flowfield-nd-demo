@@ -11,7 +11,7 @@ pub fn compute_n_grid(
 ) -> Vec<(Vec3, Vec3)> {
     let mut out = vec![];
 
-    let shape: Vec<usize> = arr.shape().iter().map(|w| w + 1).collect();
+    let shape: Vec<usize> = arr.shape().iter().map(|w| w + 0).collect();
 
     for tl in fill_shape(&shape) {
         let b = proj.project(&tl.iter().map(|p| *p as f32).collect::<Vec<f32>>());
