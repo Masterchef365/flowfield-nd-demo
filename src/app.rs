@@ -22,6 +22,7 @@ pub struct DemoApp {
     draw_centers: bool,
     draw_staggered: bool,
     draw_staggered_dim: usize,
+    blower: bool,
 }
 
 impl Default for DemoApp {
@@ -55,6 +56,7 @@ impl DemoApp {
             draw_grid: true,
             draw_centers: true,
             draw_staggered: false,
+            blower: false,
             cfg,
             pcld,
             grid,
@@ -92,6 +94,11 @@ impl eframe::App for DemoApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         ctx.request_repaint();
 
+        if self.blower {
+            let pos: Vec<usize> = self.sim.get_flow().shape().into_iter().map(|x| x/2).collect();
+            self.sim.get_flow_mut().get_axes_mut()[0][&*pos] = 1.;
+        }
+
         self.sim.step(&self.cfg);
 
         sweep_pointcloud(&mut self.pcld, self.sim.get_flow(), self.cfg.dt);
@@ -123,6 +130,7 @@ impl eframe::App for DemoApp {
                 ui.checkbox(&mut self.draw_staggered, "Draw storage");
                 ui.add(DragValue::new(&mut self.draw_staggered_dim).clamp_range(0..=self.sim.dims()));
                 ui.checkbox(&mut self.draw_centers, "Draw centers");
+                ui.checkbox(&mut self.blower, "Blower");
 
                 ui.add(DragValue::new(&mut self.cfg.dt).prefix("dt: ").speed(1e-2).clamp_range(0.0..=10.0));
 
