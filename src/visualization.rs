@@ -61,8 +61,14 @@ pub fn draw_flowfield_staggered(
     proj: &dyn Projection,
     ff: &FlowField,
     scale: f32,
+    sel_dim: Option<usize>,
 ) {
     for (dim, axis) in ff.get_axes().iter().enumerate() {
+        if let Some(sel) = sel_dim {
+            if dim != sel {
+                continue;
+            }
+        }
         for (idx, value) in axis.indexed_iter() {
             let mut pos: Vec<f32> = idx.as_array_view().iter().map(|c| *c as f32).collect();
 

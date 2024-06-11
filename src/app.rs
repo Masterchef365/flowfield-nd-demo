@@ -21,6 +21,7 @@ pub struct DemoApp {
     draw_grid: bool,
     draw_centers: bool,
     draw_staggered: bool,
+    draw_staggered_dim: usize,
 }
 
 impl Default for DemoApp {
@@ -50,6 +51,7 @@ impl DemoApp {
         let cfg = Default::default();
 
         Self {
+            draw_staggered_dim: 0,
             draw_grid: true,
             draw_centers: true,
             draw_staggered: true,
@@ -120,6 +122,7 @@ impl eframe::App for DemoApp {
                 ui.checkbox(&mut self.draw_grid, "Draw grid");
                 ui.checkbox(&mut self.draw_staggered, "Draw storage");
                 ui.checkbox(&mut self.draw_centers, "Draw centers");
+                ui.add(DragValue::new(&mut self.draw_staggered_dim).clamp_range(0..=self.sim.dims()));
 
                 if resp_dims.changed() || resp_width.changed() || regen {
                     *self = Self::from_dims(dims, width);
@@ -157,7 +160,9 @@ impl eframe::App for DemoApp {
                         }
 
                         if self.draw_staggered {
-                            draw_flowfield_staggered(paint, &self.proj, self.sim.get_flow(), 3.);
+                            let sel = (self.draw_staggered_dim != 0).then(|| self.draw_staggered_dim - 1);
+
+                            draw_flowfield_staggered(paint, &self.proj, self.sim.get_flow(), 3., sel);
                         }
 
                         draw_pcld(&self.pcld, &self.proj, paint, 1., Color32::from_gray(180));
