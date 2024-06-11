@@ -56,6 +56,30 @@ pub fn draw_flowfield_interp(
     }
 }
 
+pub fn draw_flowfield_raw(
+    paint: &Painter3D,
+    proj: &dyn Projection,
+    ff: &FlowField,
+    scale: f32,
+) {
+    for (dim, axis) in ff.get_axes().iter().enumerate() {
+        for (idx, value) in axis.indexed_iter() {
+            let mut pos: Vec<f32> = idx.as_array_view().iter().map(|c| *c as f32).collect();
+
+            pos.iter_mut().enumerate().for_each(|(idx, p)| if idx != dim { *p -= 0.5 });
+            let a = proj.project(&pos);
+
+            pos.iter_mut().enumerate().for_each(|(idx, p)| if idx == dim { *p += scale * *value });
+            let b = proj.project(&pos);
+
+            let color = Color32::LIGHT_BLUE;
+            paint.circle_filled(a, 2., color);
+            paint.line(a, b, Stroke::new(1., color));
+        }
+    }
+}
+
+
 pub fn draw_n_grid(
     buf: &[(Vec3, Vec3)],
     paint: &Painter3D,
