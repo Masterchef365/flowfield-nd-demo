@@ -36,7 +36,7 @@ pub struct DemoApp {
 
 impl Default for DemoApp {
     fn default() -> Self {
-        Self::from_dims(2, 5)
+        Self::from_dims(4, 4)
     }
 }
 
