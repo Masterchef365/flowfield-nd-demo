@@ -34,7 +34,7 @@ pub fn compute_n_grid(
     out
 }
 
-pub fn draw_flowfield_interp(
+pub fn draw_flowfield_interp_centers(
     paint: &Painter3D,
     proj: &dyn Projection,
     ff: &FlowField,
@@ -56,7 +56,7 @@ pub fn draw_flowfield_interp(
     }
 }
 
-pub fn draw_flowfield_raw(
+pub fn draw_flowfield_staggered(
     paint: &Painter3D,
     proj: &dyn Projection,
     ff: &FlowField,

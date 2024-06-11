@@ -4,7 +4,7 @@ use flowfield_nd::{sweep_pointcloud, FlowField, FluidSolver, PointCloud, SolverC
 use rand::Rng;
 use threegui::Vec3;
 
-use crate::{projection::{generate_axes, AxisProjection}, visualization::{compute_n_grid, draw_flowfield_interp, draw_flowfield_raw, draw_n_grid, draw_pcld, random_pcld_uniform}};
+use crate::{projection::{generate_axes, AxisProjection}, visualization::{compute_n_grid, draw_flowfield_interp_centers, draw_flowfield_staggered, draw_n_grid, draw_pcld, random_pcld_uniform}};
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 //#[derive(serde::Deserialize, serde::Serialize)]
@@ -19,6 +19,8 @@ pub struct DemoApp {
     grid: Vec<(Vec3, Vec3)>,
 
     draw_grid: bool,
+    draw_centers: bool,
+    draw_staggered: bool,
 }
 
 impl Default for DemoApp {
@@ -49,6 +51,8 @@ impl DemoApp {
 
         Self {
             draw_grid: true,
+            draw_centers: true,
+            draw_staggered: true,
             cfg,
             pcld,
             grid,
@@ -114,6 +118,8 @@ impl eframe::App for DemoApp {
                 let regen = ui.button("Refresh").clicked();
 
                 ui.checkbox(&mut self.draw_grid, "Draw grid");
+                ui.checkbox(&mut self.draw_staggered, "Draw storage");
+                ui.checkbox(&mut self.draw_centers, "Draw centers");
 
                 if resp_dims.changed() || resp_width.changed() || regen {
                     *self = Self::from_dims(dims, width);
@@ -146,8 +152,13 @@ impl eframe::App for DemoApp {
                             draw_n_grid(&self.grid, paint, Stroke::new(1., Color32::from_gray(90)));
                         }
 
-                        draw_flowfield_interp(paint, &self.proj, self.sim.get_flow(), 3.);
-                        draw_flowfield_raw(paint, &self.proj, self.sim.get_flow(), 3.);
+                        if self.draw_centers {
+                            draw_flowfield_interp_centers(paint, &self.proj, self.sim.get_flow(), 3.);
+                        }
+
+                        if self.draw_staggered {
+                            draw_flowfield_staggered(paint, &self.proj, self.sim.get_flow(), 3.);
+                        }
 
                         draw_pcld(&self.pcld, &self.proj, paint, 1., Color32::from_gray(180));
                     })
