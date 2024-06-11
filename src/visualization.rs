@@ -34,6 +34,28 @@ pub fn compute_n_grid(
     out
 }
 
+pub fn draw_flowfield_interp(
+    paint: &Painter3D,
+    proj: &dyn Projection,
+    ff: &FlowField,
+    scale: f32,
+) {
+    for cell in combos(0, ff.width() as i32 - 2, 1, ff.dims()) {
+        let mut pos: Vec<f32> = cell.iter().map(|c| *c as f32).collect();
+        let interp = ff.n_linear_interp(&pos, flowfield_nd::Boundary::Zero).unwrap();
+        
+        pos.iter_mut().for_each(|p| *p += 0.5);
+        let a = proj.project(&pos);
+
+        pos.iter_mut().zip(interp).for_each(|(p, i)| *p += i * scale);
+        let b = proj.project(&pos);
+
+        let color = Color32::RED;
+        paint.circle_filled(a, 2., color);
+        paint.line(a, b, Stroke::new(1., color));
+    }
+}
+
 pub fn draw_n_grid(
     buf: &[(Vec3, Vec3)],
     paint: &Painter3D,

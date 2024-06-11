@@ -4,7 +4,7 @@ use flowfield_nd::{sweep_pointcloud, FlowField, FluidSolver, PointCloud, SolverC
 use rand::Rng;
 use threegui::Vec3;
 
-use crate::{projection::{generate_axes, AxisProjection}, visualization::{compute_n_grid, draw_n_grid, draw_pcld, random_pcld_uniform}};
+use crate::{projection::{generate_axes, AxisProjection}, visualization::{compute_n_grid, draw_flowfield_interp, draw_n_grid, draw_pcld, random_pcld_uniform}};
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 //#[derive(serde::Deserialize, serde::Serialize)]
@@ -145,6 +145,8 @@ impl eframe::App for DemoApp {
                         if self.draw_grid {
                             draw_n_grid(&self.grid, paint, Stroke::new(1., Color32::from_gray(90)));
                         }
+
+                        draw_flowfield_interp(paint, &self.proj, self.sim.get_flow(), 3.);
 
                         draw_pcld(&self.pcld, &self.proj, paint, 1., Color32::from_gray(180));
                     })
