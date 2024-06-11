@@ -7,6 +7,13 @@ pub fn generate_axes(dims: usize) -> Vec<Vec3> {
     let mut rng = rand::thread_rng();
     if dims <= 3 {
         [Vec3::X, Vec3::Y, Vec3::Z][..dims].to_vec()
+    } else if dims == 4 {
+        [
+            Vec3::new(0., 0., 1.),
+            Vec3::new((8.0f32/9.).sqrt(), 0., -1./3.),
+            Vec3::new(-(2.0f32/9.).sqrt(), (2.0f32/3.).sqrt(), -1./3.),
+            Vec3::new(-(2.0f32/9.).sqrt(), -(2.0f32/3.).sqrt(), -1./3.),
+        ].into_iter().map(|c| c / (8.0f32/3.).sqrt()).collect()
     } else {
         (0..dims).map(|_| gen_rand_vect(&mut rng, dims)).collect()
     }
