@@ -4,7 +4,13 @@ use flowfield_nd::{sweep_pointcloud, FlowField, FluidSolver, PointCloud, SolverC
 use rand::Rng;
 use threegui::Vec3;
 
-use crate::{projection::{generate_axes, AxisProjection}, visualization::{compute_n_grid, draw_flowfield_interp_centers, draw_flowfield_staggered, draw_n_grid, draw_pcld, random_pcld_uniform}};
+use crate::{
+    projection::{generate_axes, AxisProjection},
+    visualization::{
+        compute_n_grid, draw_flowfield_interp_centers, draw_flowfield_staggered, draw_n_grid,
+        draw_pcld, random_pcld_uniform,
+    },
+};
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 //#[derive(serde::Deserialize, serde::Serialize)]
@@ -73,10 +79,10 @@ impl DemoApp {
         // Load previous app state (if any).
         // Note that you must enable the `persistence` feature for this to work.
         /*
-           if let Some(storage) = cc.storage {
-           return eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default();
-           }
-           */
+        if let Some(storage) = cc.storage {
+        return eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default();
+        }
+        */
 
         Default::default()
     }
@@ -95,7 +101,13 @@ impl eframe::App for DemoApp {
         ctx.request_repaint();
 
         if self.blower {
-            let pos: Vec<usize> = self.sim.get_flow().shape().into_iter().map(|x| x/2).collect();
+            let pos: Vec<usize> = self
+                .sim
+                .get_flow()
+                .shape()
+                .into_iter()
+                .map(|x| x / 2)
+                .collect();
             self.sim.get_flow_mut().get_axes_mut()[0][&*pos] = 1.;
         }
 
@@ -103,41 +115,54 @@ impl eframe::App for DemoApp {
 
         sweep_pointcloud(&mut self.pcld, self.sim.get_flow(), self.cfg.dt);
 
-        egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
+        egui::SidePanel::left("left_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
 
-            egui::menu::bar(ui, |ui| {
-                // NOTE: no File->Quit on web pages!
-                let is_web = cfg!(target_arch = "wasm32");
-                if !is_web {
-                    ui.menu_button("File", |ui| {
-                        if ui.button("Quit").clicked() {
-                            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
-                        }
-                    });
-                    ui.add_space(16.0);
-                }
+            let mut dims = self.sim.dims();
+            let mut width = self.sim.width();
 
-                egui::widgets::global_dark_light_mode_buttons(ui);
+            ui.label("Size");
+            let resp_dims = ui.add(
+                DragValue::new(&mut dims)
+                    .prefix("Dimensions: ")
+                    .clamp_range(1..=7),
+            );
+            let resp_width = ui.add(
+                DragValue::new(&mut width)
+                    .prefix("Width: ")
+                    .clamp_range(2..=100),
+            );
+            let regen = ui.button("Refresh").clicked();
+            ui.separator();
 
-                let mut dims = self.sim.dims();
-                let mut width = self.sim.width();
-                let resp_dims = ui.add(DragValue::new(&mut dims).prefix("dims: ").clamp_range(1..=24));
-                let resp_width = ui.add(DragValue::new(&mut width).prefix("width: ").clamp_range(2..=100));
-                let regen = ui.button("Refresh").clicked();
+            ui.label("Kinetics");
+            ui.checkbox(&mut self.blower, "Blower");
 
-                ui.checkbox(&mut self.draw_grid, "Draw grid");
+            ui.add(
+                DragValue::new(&mut self.cfg.dt)
+                    .prefix("dt: ")
+                    .speed(1e-2)
+                    .clamp_range(0.0..=10.0),
+            );
+
+            ui.separator();
+
+            ui.label("Visualization");
+            ui.checkbox(&mut self.draw_grid, "Draw grid");
+            ui.horizontal(|ui| {
                 ui.checkbox(&mut self.draw_staggered, "Draw storage");
-                ui.add(DragValue::new(&mut self.draw_staggered_dim).clamp_range(0..=self.sim.dims()));
-                ui.checkbox(&mut self.draw_centers, "Draw centers");
-                ui.checkbox(&mut self.blower, "Blower");
-
-                ui.add(DragValue::new(&mut self.cfg.dt).prefix("dt: ").speed(1e-2).clamp_range(0.0..=10.0));
-
-                if resp_dims.changed() || resp_width.changed() || regen {
-                    *self = Self::from_dims(dims, width);
-                }
+                ui.add(
+                    DragValue::new(&mut self.draw_staggered_dim)
+                        .prefix("Dimension (0 = all): ")
+                        .clamp_range(0..=self.sim.dims()),
+                );
             });
+
+            ui.checkbox(&mut self.draw_centers, "Draw centers");
+
+            if resp_dims.changed() || resp_width.changed() || regen {
+                *self = Self::from_dims(dims, width);
+            }
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
@@ -147,32 +172,44 @@ impl eframe::App for DemoApp {
                     .show(ui, |thr| {
                         let paint = thr.painter();
                         /*
-                           threegui::utils::grid(
-                           &paint,
-                           10,
-                           1.,
-                           Stroke::new(1., Color32::from_gray(40)),
-                           );
-                           */
+                        threegui::utils::grid(
+                        &paint,
+                        10,
+                        1.,
+                        Stroke::new(1., Color32::from_gray(40)),
+                        );
+                        */
 
                         /*
-                           for axis in &self.axes {
-                           paint.circle_filled(*axis, 5., Color32::RED);
-                           }
-                           */
+                        for axis in &self.axes {
+                        paint.circle_filled(*axis, 5., Color32::RED);
+                        }
+                        */
 
                         if self.draw_grid {
                             draw_n_grid(&self.grid, paint, Stroke::new(1., Color32::from_gray(90)));
                         }
 
                         if self.draw_centers {
-                            draw_flowfield_interp_centers(paint, &self.proj, self.sim.get_flow(), 3.);
+                            draw_flowfield_interp_centers(
+                                paint,
+                                &self.proj,
+                                self.sim.get_flow(),
+                                3.,
+                            );
                         }
 
                         if self.draw_staggered {
-                            let sel = (self.draw_staggered_dim != 0).then(|| self.draw_staggered_dim - 1);
+                            let sel =
+                                (self.draw_staggered_dim != 0).then(|| self.draw_staggered_dim - 1);
 
-                            draw_flowfield_staggered(paint, &self.proj, self.sim.get_flow(), 3., sel);
+                            draw_flowfield_staggered(
+                                paint,
+                                &self.proj,
+                                self.sim.get_flow(),
+                                3.,
+                                sel,
+                            );
                         }
 
                         draw_pcld(&self.pcld, &self.proj, paint, 1., Color32::from_gray(180));
