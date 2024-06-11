@@ -1089,6 +1089,7 @@ dependencies = [
 [[package]]
 name = "flowfield-nd"
 version = "0.1.0"
+source = "git+https://github.com/Masterchef365/flowfield-nd.git?rev=e9b71b0#e9b71b0d0bf7de006afdb0557ddd48f11964cb75"
 dependencies = [
  "ndarray",
 ]
