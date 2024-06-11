@@ -5,7 +5,7 @@ use rand::Rng;
 use threegui::Vec3;
 
 use crate::{
-    projection::{generate_axes, AxisProjection},
+    projection::{generate_axes, AxisProjection, Projection},
     visualization::{
         compute_n_grid, draw_flowfield_interp_centers, draw_flowfield_staggered, draw_n_grid,
         draw_pcld, random_pcld_uniform,
@@ -30,6 +30,8 @@ pub struct DemoApp {
     draw_staggered_dim: usize,
     blower: bool,
     pause: bool,
+
+    last_pcld: Option<Vec<Vec3>>,
 }
 
 impl Default for DemoApp {
@@ -70,6 +72,7 @@ impl DemoApp {
             grid,
             proj,
             sim,
+            last_pcld: None,
         }
     }
 
@@ -101,6 +104,8 @@ impl eframe::App for DemoApp {
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         ctx.request_repaint();
+
+        let pcld_3d: Vec<Vec3> = self.pcld.0.outer_iter().map(|pos| self.proj.project(pos.as_slice().unwrap())).collect();
 
         if !self.pause {
             if self.blower {
@@ -217,9 +222,17 @@ impl eframe::App for DemoApp {
                             );
                         }
 
-                        draw_pcld(&self.pcld, &self.proj, paint, 1., Color32::from_gray(180));
+                        if let Some(last) = &self.last_pcld {
+                            for (a, b) in pcld_3d.iter().zip(last) {
+                                paint.line(*a, *b, Stroke::new(1., Color32::WHITE));
+                            }
+                        }
+
+                        //draw_pcld(&self.pcld, &self.proj, paint, 1., Color32::from_gray(180));
                     })
             });
         });
+
+        self.last_pcld = Some(pcld_3d);
     }
 }
