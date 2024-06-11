@@ -233,6 +233,8 @@ impl eframe::App for DemoApp {
             });
         });
 
-        self.last_pcld = Some(pcld_3d);
+        if !self.pause {
+            self.last_pcld = Some(pcld_3d);
+        }
     }
 }
