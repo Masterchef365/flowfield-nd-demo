@@ -29,6 +29,7 @@ pub struct DemoApp {
     draw_staggered: bool,
     draw_staggered_dim: usize,
     blower: bool,
+    pause: bool,
 }
 
 impl Default for DemoApp {
@@ -62,7 +63,8 @@ impl DemoApp {
             draw_grid: true,
             draw_centers: true,
             draw_staggered: false,
-            blower: false,
+            blower: true,
+            pause: false,
             cfg,
             pcld,
             grid,
@@ -100,20 +102,22 @@ impl eframe::App for DemoApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         ctx.request_repaint();
 
-        if self.blower {
-            let pos: Vec<usize> = self
-                .sim
-                .get_flow()
-                .shape()
-                .into_iter()
-                .map(|x| x / 2)
-                .collect();
-            self.sim.get_flow_mut().get_axes_mut()[0][&*pos] = 1.;
+        if !self.pause {
+            if self.blower {
+                let pos: Vec<usize> = self
+                    .sim
+                    .get_flow()
+                    .shape()
+                    .into_iter()
+                    .map(|x| x / 2)
+                    .collect();
+                self.sim.get_flow_mut().get_axes_mut()[0][&*pos] = 1.;
+            }
+
+            self.sim.step(&self.cfg);
+
+            sweep_pointcloud(&mut self.pcld, self.sim.get_flow(), self.cfg.dt);
         }
-
-        self.sim.step(&self.cfg);
-
-        sweep_pointcloud(&mut self.pcld, self.sim.get_flow(), self.cfg.dt);
 
         egui::SidePanel::left("left_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
@@ -144,6 +148,7 @@ impl eframe::App for DemoApp {
                     .speed(1e-2)
                     .clamp_range(0.0..=10.0),
             );
+            ui.checkbox(&mut self.pause, "Pause");
 
             ui.separator();
 
