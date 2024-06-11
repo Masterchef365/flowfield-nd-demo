@@ -54,7 +54,7 @@ impl DemoApp {
 
         let grid = compute_n_grid(&proj, &sim.shape());
 
-        let pcld = random_pcld_uniform(1000, &sim.shape());
+        let pcld = random_pcld_uniform(2000, &sim.shape());
 
         let cfg = Default::default();
 
