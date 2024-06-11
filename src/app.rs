@@ -26,7 +26,7 @@ pub struct DemoApp {
 
 impl Default for DemoApp {
     fn default() -> Self {
-        Self::from_dims(3, 5)
+        Self::from_dims(2, 5)
     }
 }
 
@@ -54,7 +54,7 @@ impl DemoApp {
             draw_staggered_dim: 0,
             draw_grid: true,
             draw_centers: true,
-            draw_staggered: true,
+            draw_staggered: false,
             cfg,
             pcld,
             grid,
