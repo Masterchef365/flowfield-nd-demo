@@ -1,5 +1,5 @@
 use egui::{Color32, DragValue, Stroke, Vec2};
-use env_logger::fmt::Color;
+//use env_logger::fmt::Color;
 use flowfield_nd::{sweep_pointcloud, FlowField, FluidSolver, PointCloud, SolverConfig};
 use rand::Rng;
 use threegui::Vec3;
