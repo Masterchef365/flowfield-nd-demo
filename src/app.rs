@@ -121,8 +121,10 @@ impl eframe::App for DemoApp {
 
                 ui.checkbox(&mut self.draw_grid, "Draw grid");
                 ui.checkbox(&mut self.draw_staggered, "Draw storage");
-                ui.checkbox(&mut self.draw_centers, "Draw centers");
                 ui.add(DragValue::new(&mut self.draw_staggered_dim).clamp_range(0..=self.sim.dims()));
+                ui.checkbox(&mut self.draw_centers, "Draw centers");
+
+                ui.add(DragValue::new(&mut self.cfg.dt).prefix("dt: ").speed(1e-2).clamp_range(0.0..=10.0));
 
                 if resp_dims.changed() || resp_width.changed() || regen {
                     *self = Self::from_dims(dims, width);
