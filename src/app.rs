@@ -140,7 +140,7 @@ impl eframe::App for DemoApp {
             let flowfield = self.sim.get_flow_mut().get_axes_mut();
             for (axis, vel) in flowfield.iter_mut().zip(&self.blower_vel) {
                 // NOTE: This isn't exact 
-                axis[self.blower_pos.as_slice()] = *vel;
+                axis[self.blower_pos.as_slice()] = *vel * self.blower_mag;
             }
 
             self.sim.step(&self.cfg);
@@ -198,7 +198,7 @@ impl eframe::App for DemoApp {
             ui.add(
                 DragValue::new(&mut self.blower_mag)
                     .speed(1e-1)
-                    .prefix("Blower magnitude")
+                    .prefix("Blower magnitude: ")
                     .clamp_range(0.0..=1.0)
             );
 
