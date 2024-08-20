@@ -177,7 +177,7 @@ impl eframe::App for DemoApp {
                 for value in &mut self.blower_pos {
                     ui.add(
                         DragValue::new(value)
-                            .speed(1e-1)
+                            .speed(1e-2)
                             .clamp_range(0..=self.sim.width() - 1),
                     );
                 }
@@ -189,7 +189,7 @@ impl eframe::App for DemoApp {
                 for value in &mut self.blower_vel {
                     ui.add(
                         DragValue::new(value)
-                            .speed(1e-1)
+                            .speed(1e-2)
                             //.clamp_range(-1.0..=1.0)
                     );
                 }
@@ -223,6 +223,10 @@ impl eframe::App for DemoApp {
                         .clamp_range(0..=self.sim.dims()),
                 );
             });
+
+            if ui.button("Reset particles").clicked() {
+                self.pcld = random_pcld_uniform(2000, &self.sim.shape());
+            }
 
             ui.checkbox(&mut self.draw_centers, "Draw centers");
 
