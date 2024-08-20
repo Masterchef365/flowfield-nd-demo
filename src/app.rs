@@ -28,7 +28,11 @@ pub struct DemoApp {
     draw_centers: bool,
     draw_staggered: bool,
     draw_staggered_dim: usize,
-    blower: bool,
+
+    blower_pos: Vec<usize>,
+    blower_vel: Vec<f32>,
+    blower_mag: f32,
+
     pause: bool,
 
     last_pcld: Option<Vec<Vec3>>,
@@ -65,7 +69,9 @@ impl DemoApp {
             draw_grid: true,
             draw_centers: true,
             draw_staggered: false,
-            blower: true,
+            blower_pos: vec![size / 2; dims],
+            blower_vel: vec![1.0; dims],
+            blower_mag: 1.0,
             pause: false,
             cfg,
             pcld,
@@ -105,9 +111,20 @@ impl eframe::App for DemoApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         ctx.request_repaint();
 
-        let pcld_3d: Vec<Vec3> = self.pcld.0.outer_iter().map(|pos| self.proj.project(pos.as_slice().unwrap())).collect();
+        // Make sure the dimensions match up
+        self.blower_pos
+            .resize(self.sim.dims(), self.sim.width() / 2);
+        self.blower_vel.resize(self.sim.dims(), 1.0);
+
+        let pcld_3d: Vec<Vec3> = self
+            .pcld
+            .0
+            .outer_iter()
+            .map(|pos| self.proj.project(pos.as_slice().unwrap()))
+            .collect();
 
         if !self.pause {
+            /*
             if self.blower {
                 let pos: Vec<usize> = self
                     .sim
@@ -117,6 +134,13 @@ impl eframe::App for DemoApp {
                     .map(|x| x / 2)
                     .collect();
                 self.sim.get_flow_mut().get_axes_mut()[0][&*pos] = 1.;
+            }
+            */
+
+            let flowfield = self.sim.get_flow_mut().get_axes_mut();
+            for (axis, vel) in flowfield.iter_mut().zip(&self.blower_vel) {
+                // NOTE: This isn't exact 
+                axis[self.blower_pos.as_slice()] = *vel;
             }
 
             self.sim.step(&self.cfg);
@@ -145,7 +169,39 @@ impl eframe::App for DemoApp {
             ui.separator();
 
             ui.label("Kinetics");
-            ui.checkbox(&mut self.blower, "Blower");
+            ui.weak("Blower");
+
+            ui.horizontal(|ui| {
+                ui.label("Blower position: ");
+
+                for value in &mut self.blower_pos {
+                    ui.add(
+                        DragValue::new(value)
+                            .speed(1e-1)
+                            .clamp_range(0..=self.sim.width() - 1),
+                    );
+                }
+            });
+
+            ui.horizontal(|ui| {
+                ui.label("Blower velocity: ");
+
+                for value in &mut self.blower_vel {
+                    ui.add(
+                        DragValue::new(value)
+                            .speed(1e-1)
+                            //.clamp_range(-1.0..=1.0)
+                    );
+                }
+            });
+
+            ui.add(
+                DragValue::new(&mut self.blower_mag)
+                    .speed(1e-1)
+                    .prefix("Blower magnitude")
+                    .clamp_range(0.0..=1.0)
+            );
+
 
             ui.add(
                 DragValue::new(&mut self.cfg.dt)
