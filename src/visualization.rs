@@ -44,15 +44,16 @@ pub fn draw_flowfield_interp_centers(
         let mut pos: Vec<f32> = cell.iter().map(|c| *c as f32).collect();
         
         pos.iter_mut().for_each(|p| *p += 0.5);
-        let interp = ff.n_linear_interp(&pos, flowfield_nd::Boundary::Zero).unwrap();
-        let a = proj.project(&pos);
+        if let Some(interp) = ff.n_linear_interp(&pos) {
+            let a = proj.project(&pos);
 
-        pos.iter_mut().zip(interp).for_each(|(p, i)| *p += i * scale);
-        let b = proj.project(&pos);
+            pos.iter_mut().zip(interp).for_each(|(p, i)| *p += i * scale);
+            let b = proj.project(&pos);
 
-        let color = Color32::RED;
-        paint.circle_filled(a, 2., color);
-        paint.line(a, b, Stroke::new(1., color));
+            let color = Color32::RED;
+            paint.circle_filled(a, 2., color);
+            paint.line(a, b, Stroke::new(1., color));
+        }
     }
 }
 
