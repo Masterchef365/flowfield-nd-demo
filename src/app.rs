@@ -197,7 +197,7 @@ impl eframe::App for DemoApp {
 
             ui.add(
                 DragValue::new(&mut self.blower_mag)
-                    .speed(1e-1)
+                    .speed(1e-3)
                     .prefix("Blower magnitude: ")
                     .clamp_range(0.0..=1.0)
             );
