@@ -1114,6 +1114,7 @@ dependencies = [
 [[package]]
 name = "flowfield-nd"
 version = "0.1.0"
+source = "git+https://github.com/Masterchef365/flowfield-nd.git?rev=31c65c0a818cacb970df599ef417f78a4287838d#31c65c0a818cacb970df599ef417f78a4287838d"
 dependencies = [
  "ndarray",
  "rayon",
@@ -1687,7 +1688,6 @@ dependencies = [
  "num-integer",
  "num-traits",
  "rawpointer",
- "rayon",
 ]
 
 [[package]]
