@@ -203,14 +203,6 @@ impl eframe::App for DemoApp {
             );
 
 
-            ui.add(
-                DragValue::new(&mut self.cfg.dt)
-                    .prefix("dt: ")
-                    .speed(1e-2)
-                    .clamp_range(0.0..=10.0),
-            );
-            ui.checkbox(&mut self.pause, "Pause");
-
             ui.separator();
 
             ui.label("Visualization");
@@ -233,6 +225,32 @@ impl eframe::App for DemoApp {
             if resp_dims.changed() || resp_width.changed() || regen {
                 *self = Self::from_dims(dims, width);
             }
+
+            ui.label("Solver");
+
+            ui.add(
+                DragValue::new(&mut self.cfg.overstep)
+                    .speed(1e-3)
+                    .prefix("Overstep: ")
+                    .clamp_range(0.0..=2.0)
+            );
+
+            ui.add(
+                DragValue::new(&mut self.cfg.n_iters)
+                    .speed(1e-2)
+                    .prefix("Iterations: ")
+            );
+
+            ui.horizontal(|ui| {
+                ui.add(
+                    DragValue::new(&mut self.cfg.dt)
+                    .prefix("dt: ")
+                    .speed(1e-2)
+                    .clamp_range(0.0..=10.0),
+                );
+                ui.checkbox(&mut self.pause, "Pause");
+            });
+
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
